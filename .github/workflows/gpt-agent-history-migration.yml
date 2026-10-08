@@ -1,0 +1,69 @@
+name: GPT Agent History Migration
+
+on:
+  push:
+    branches:
+      - lab/gpt-chat-agent-2026-10-08
+    paths:
+      - experiments/gpt_agent/migrate_history.py
+      - experiments/gpt_agent/activate_bootstrap.py
+      - experiments/gpt_agent/test_migration.py
+      - .github/workflows/gpt-agent-history-migration.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  migrate-and-validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout prototype branch
+        uses: actions/checkout@v4
+        with:
+          ref: lab/gpt-chat-agent-2026-10-08
+          fetch-depth: 0
+
+      - name: Checkout canonical continuity read-only source
+        uses: actions/checkout@v4
+        with:
+          repository: MATRIXNEO23/scodinzolina-conntinuity
+          ref: main
+          path: _canonical
+          persist-credentials: false
+
+      - name: Run original GPT agent tests
+        run: python -W ignore::ResourceWarning experiments/gpt_agent/test_agent.py
+
+      - name: Run migration tests
+        working-directory: experiments/gpt_agent
+        run: python -m unittest -v test_migration.py
+
+      - name: Build complete native history bootstrap
+        run: |
+          STAMP="$(date -u +'%Y-%m-%dT%H:%M:%S')"
+          python experiments/gpt_agent/migrate_history.py \
+            --source-root _canonical \
+            --output experiments/gpt_agent/bootstrap/gptina-history.json \
+            --name GPTina \
+            --generated-at "$STAMP"
+
+      - name: Validate bootstrap activation without legacy memory tree
+        run: |
+          rm -rf experiments/gpt_agent/.state
+          python experiments/gpt_agent/activate_bootstrap.py experiments/gpt_agent/bootstrap/gptina-history.json
+          python experiments/gpt_agent/agent.py status
+          mv _canonical /tmp/canonical-removed
+          python experiments/gpt_agent/agent.py status
+
+      - name: Commit tracked native bootstrap if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add experiments/gpt_agent/bootstrap/gptina-history.json
+          if git diff --cached --quiet; then
+            echo "Bootstrap unchanged"
+          else
+            git commit -m "Generate native GPTina history bootstrap"
+            git push origin HEAD:lab/gpt-chat-agent-2026-10-08
+          fi
