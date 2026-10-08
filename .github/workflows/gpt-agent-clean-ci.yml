@@ -1,0 +1,52 @@
+name: GPT Agent Clean CI
+
+on:
+  push:
+    branches:
+      - lab/gpt-chat-agent-2026-10-08
+  workflow_dispatch:
+
+jobs:
+  clean-native-agent:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify legacy continuity is absent
+        run: |
+          test ! -e CONTINUITY.md
+          test ! -e GPTINA_STATE.json
+          test ! -e GPTINA_REFLECTIONS.md
+          test ! -e GPTINA_SELF_PORTRAIT.md
+          test ! -d rag
+          test ! -d checkpoints
+
+      - name: Run original GPT agent tests
+        run: python -W ignore::ResourceWarning experiments/gpt_agent/test_agent.py
+
+      - name: Run migration semantic tests
+        working-directory: experiments/gpt_agent
+        run: python -m unittest -v test_migration.py
+
+      - name: Activate tracked complete bootstrap
+        run: |
+          python experiments/gpt_agent/activate_bootstrap.py experiments/gpt_agent/bootstrap/gptina-history.json --force
+          python experiments/gpt_agent/agent.py status
+
+      - name: Audit native bootstrap only
+        run: |
+          python - <<'PY'
+          import json
+          p='experiments/gpt_agent/bootstrap/gptina-history.json'
+          b=json.load(open(p, encoding='utf-8'))
+          assert b['schema']=='gpt-agent-native-bootstrap-v2'
+          assert b['record_count']==len(b['state']['memory']['nodes'])==len(b['state']['sources'])
+          assert b['record_count'] >= 500
+          roles={v['source_role'] for v in b['state']['sources'].values()}
+          required={'gptina_memory','checkpoint','reflection','stable_principles','self_portrait','shared_language'}
+          assert not (required-roles), required-roles
+          assert all(not v['original_path'].startswith('rag/index/') for v in b['state']['sources'].values())
+          assert all('/tessa/' not in v['original_path'] for v in b['state']['sources'].values())
+          assert any(v['non_operational_legacy_instruction'] for v in b['state']['sources'].values())
+          print({'clean_native_agent': True, 'records': b['record_count'], 'roles': len(roles)})
+          PY
