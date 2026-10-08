@@ -1,0 +1,339 @@
+{
+  "repository": "https://github.com/joonspk-research/generative_agents",
+  "revision": "fe05a71d3e4ed7d10bf68aa4eda6dd995ec070f4",
+  "author": "Joon Sung Park",
+  "license": "Apache-2.0",
+  "definitions": [
+    {
+      "name": "check_if_file_exists",
+      "path": "reverie/backend_server/global_methods.py",
+      "line": 157,
+      "sha256": "5bf27d66a19800ae5c7cdad6063cae1e611585e3a7e88017a92a8428aadda4c7"
+    },
+    {
+      "name": "ConceptNode",
+      "path": "reverie/backend_server/persona/memory_structures/associative_memory.py",
+      "line": 19,
+      "sha256": "3e000653b06c9ed612c5d68a2220ec541147b780869832e989f1ae6e66e8c7af"
+    },
+    {
+      "name": "AssociativeMemory",
+      "path": "reverie/backend_server/persona/memory_structures/associative_memory.py",
+      "line": 50,
+      "sha256": "6b52ba0fd2517ec4a5374c62d251e8b106f9c971bd1119725d396402b64e28c7"
+    },
+    {
+      "name": "Scratch",
+      "path": "reverie/backend_server/persona/memory_structures/scratch.py",
+      "line": 14,
+      "sha256": "3643d3bcfe3d0f06d769c6edea529a4b36ebe9f1decbeac876005c2f9b93cb66"
+    },
+    {
+      "name": "retrieve",
+      "path": "reverie/backend_server/persona/cognitive_modules/retrieve.py",
+      "line": 16,
+      "sha256": "8181b825731a2f3657d017ffbf5a00e6f40f56a7646c90d93a77d6873b148cdd"
+    },
+    {
+      "name": "cos_sim",
+      "path": "reverie/backend_server/persona/cognitive_modules/retrieve.py",
+      "line": 49,
+      "sha256": "c85e04be1723241e6c02ebc6be6d993af5b3e479558915834e15ae0fe86692dc"
+    },
+    {
+      "name": "normalize_dict_floats",
+      "path": "reverie/backend_server/persona/cognitive_modules/retrieve.py",
+      "line": 70,
+      "sha256": "946db8169cd6d9847ac053d639804de251c030d651519d4797310142d4dcdc46"
+    },
+    {
+      "name": "top_highest_x_values",
+      "path": "reverie/backend_server/persona/cognitive_modules/retrieve.py",
+      "line": 107,
+      "sha256": "07eca9cfcfd7d39a1d270bc4823edecaadf8e8dbea7ce50e1eb06b49eae33247"
+    },
+    {
+      "name": "extract_recency",
+      "path": "reverie/backend_server/persona/cognitive_modules/retrieve.py",
+      "line": 132,
+      "sha256": "eafe4ae55ec3a0e305bc35968e6e3226d0f6dc2ec596dda81cf439fd22f8154f"
+    },
+    {
+      "name": "extract_importance",
+      "path": "reverie/backend_server/persona/cognitive_modules/retrieve.py",
+      "line": 155,
+      "sha256": "261c4b4114965daf27023dbba153e1fd07ef4bee639a4790b3cdc087ed4ab96c"
+    },
+    {
+      "name": "extract_relevance",
+      "path": "reverie/backend_server/persona/cognitive_modules/retrieve.py",
+      "line": 175,
+      "sha256": "a9af97bc234c186e3615aef6e8c3504d91896df3f207616a79c8f51a6d388be5"
+    },
+    {
+      "name": "new_retrieve",
+      "path": "reverie/backend_server/persona/cognitive_modules/retrieve.py",
+      "line": 199,
+      "sha256": "76965aa068cae0d91be2d392a73d2a0261bcc77962f9e77e0aca863fe97af113"
+    },
+    {
+      "name": "generate_focal_points",
+      "path": "reverie/backend_server/persona/cognitive_modules/reflect.py",
+      "line": 21,
+      "sha256": "2a2081e7c38796d6ac8226dd5e41378d84d9fa0e8210a615cf1e0fbf40a9acae"
+    },
+    {
+      "name": "generate_insights_and_evidence",
+      "path": "reverie/backend_server/persona/cognitive_modules/reflect.py",
+      "line": 38,
+      "sha256": "70c8c7f35fca1bef7224717ad9aee1e2d541588e3fa21e3fde511afdbd39deb5"
+    },
+    {
+      "name": "generate_action_event_triple",
+      "path": "reverie/backend_server/persona/cognitive_modules/reflect.py",
+      "line": 58,
+      "sha256": "8f1e6d801c37fc8a188d1c158ce3538d6a7fa8639bf4ecc0d60083cfceda9ca9"
+    },
+    {
+      "name": "generate_poig_score",
+      "path": "reverie/backend_server/persona/cognitive_modules/reflect.py",
+      "line": 73,
+      "sha256": "0fba152610a881aa22b54ea7ddaf937d1c21d4fd99a40d29194856c8436b51cc"
+    },
+    {
+      "name": "generate_planning_thought_on_convo",
+      "path": "reverie/backend_server/persona/cognitive_modules/reflect.py",
+      "line": 87,
+      "sha256": "10e9807243d7490d4bd8452557028022fe681075fe1dc6d5a84f0a9721172188"
+    },
+    {
+      "name": "generate_memo_on_convo",
+      "path": "reverie/backend_server/persona/cognitive_modules/reflect.py",
+      "line": 92,
+      "sha256": "8dc4bf1a9c5694a6d40564cc21bd76065872c4613d3a4631ebab3285aa2d5073"
+    },
+    {
+      "name": "run_reflect",
+      "path": "reverie/backend_server/persona/cognitive_modules/reflect.py",
+      "line": 99,
+      "sha256": "628f553cb1e6ee54090db9b9907622f42df6d594732c11e8a9845ce8497328b0"
+    },
+    {
+      "name": "reflection_trigger",
+      "path": "reverie/backend_server/persona/cognitive_modules/reflect.py",
+      "line": 135,
+      "sha256": "4029f9667f124ac0a9cb90c6378ee7e04931b4d1045dddb17c61b5ee11fa47b7"
+    },
+    {
+      "name": "reset_reflection_counter",
+      "path": "reverie/backend_server/persona/cognitive_modules/reflect.py",
+      "line": 158,
+      "sha256": "8c49c1f438bc74d807ed50ca1dc680632961eb69c88a002602a3749b4a51cea7"
+    },
+    {
+      "name": "generate_summarize_ideas",
+      "path": "reverie/backend_server/persona/cognitive_modules/converse.py",
+      "line": 186,
+      "sha256": "f1f6afd9782e66a8ed868da377433d960e828e11cc98d743faf53b847b0b19e0"
+    },
+    {
+      "name": "generate_next_line",
+      "path": "reverie/backend_server/persona/cognitive_modules/converse.py",
+      "line": 194,
+      "sha256": "f34e4a166c7f105db5fdef040c2bb28ed3dc6898bd1b48c8189a2a9cd56b0a39"
+    },
+    {
+      "name": "generate_inner_thought",
+      "path": "reverie/backend_server/persona/cognitive_modules/converse.py",
+      "line": 207,
+      "sha256": "848c95183926af3e6f2d2ec1b98a93166bbc418d2872af28291090ca2554d2fb"
+    },
+    {
+      "name": "generate_summarize_agent_relationship",
+      "path": "reverie/backend_server/persona/cognitive_modules/converse.py",
+      "line": 42,
+      "sha256": "963b01ba64fc9a8bb539154c4dd601bdf32ae57f25b64dd89d6b2a2fb4b06e09"
+    },
+    {
+      "name": "generate_prompt",
+      "path": "reverie/backend_server/persona/prompt_template/gpt_structure.py",
+      "line": 227,
+      "sha256": "1c07d6750e480b2819d9bb5318ffffbedb76357b45d2b7a0c0ec1341058c2dbf"
+    },
+    {
+      "name": "run_gpt_prompt_event_triple",
+      "path": "reverie/backend_server/persona/prompt_template/run_gpt_prompt.py",
+      "line": 876,
+      "sha256": "bfc6b0b3c932c595776c90ffd8133e465740433a519248f156366c230385567b"
+    },
+    {
+      "name": "run_gpt_prompt_event_poignancy",
+      "path": "reverie/backend_server/persona/prompt_template/run_gpt_prompt.py",
+      "line": 1845,
+      "sha256": "bd1369ad25dfcb47927379fb95e7d3cb5331b78d340c85ce698f3e12c9ccea6c"
+    },
+    {
+      "name": "run_gpt_prompt_chat_poignancy",
+      "path": "reverie/backend_server/persona/prompt_template/run_gpt_prompt.py",
+      "line": 1989,
+      "sha256": "d43d958295d6367c980f78279c96d85ec89d2d0fe4054b6bea209f8e8e2058d7"
+    },
+    {
+      "name": "run_gpt_prompt_focal_pt",
+      "path": "reverie/backend_server/persona/prompt_template/run_gpt_prompt.py",
+      "line": 2064,
+      "sha256": "c5fb44725ace59a47bc49cadcef5e6bc49d6a399a42c97f39597ba525cfa23b2"
+    },
+    {
+      "name": "run_gpt_prompt_insight_and_guidance",
+      "path": "reverie/backend_server/persona/prompt_template/run_gpt_prompt.py",
+      "line": 2142,
+      "sha256": "414963b2c8bda20b17f7b4db7282c7750262111e3ee3031baf946ef449790ee3"
+    },
+    {
+      "name": "run_gpt_prompt_agent_chat_summarize_relationship",
+      "path": "reverie/backend_server/persona/prompt_template/run_gpt_prompt.py",
+      "line": 2265,
+      "sha256": "0942dddee882f1b79b738889e943d16aeffd0a5bae987b3e5bca9c5c5300d97e"
+    },
+    {
+      "name": "run_gpt_prompt_summarize_ideas",
+      "path": "reverie/backend_server/persona/prompt_template/run_gpt_prompt.py",
+      "line": 2474,
+      "sha256": "360a8b261d66022521574e821bac52285e1799ed8c2fdafb59d89b0fa5b199d4"
+    },
+    {
+      "name": "run_gpt_prompt_generate_next_convo_line",
+      "path": "reverie/backend_server/persona/prompt_template/run_gpt_prompt.py",
+      "line": 2540,
+      "sha256": "63d39d41e1d37e17a0f42f38f4afee57b7feaaafb37e07902dbf5b6c6238919e"
+    },
+    {
+      "name": "run_gpt_prompt_generate_whisper_inner_thought",
+      "path": "reverie/backend_server/persona/prompt_template/run_gpt_prompt.py",
+      "line": 2618,
+      "sha256": "48abf91f56a3c75e876faaec06e6b636562c866a8add86bba7d1d642b66912f5"
+    },
+    {
+      "name": "run_gpt_prompt_planning_thought_on_convo",
+      "path": "reverie/backend_server/persona/prompt_template/run_gpt_prompt.py",
+      "line": 2655,
+      "sha256": "00b17a1780724cb8c912f857c65e456c5c1faa69be7401dd55fba489ab89b399"
+    },
+    {
+      "name": "run_gpt_prompt_memo_on_convo",
+      "path": "reverie/backend_server/persona/prompt_template/run_gpt_prompt.py",
+      "line": 2692,
+      "sha256": "015a780e91edd847420620e460e7e9841be7556561a1c34582dc20398cca66b9"
+    },
+    {
+      "name": "run_gpt_generate_safety_score",
+      "path": "reverie/backend_server/persona/prompt_template/run_gpt_prompt.py",
+      "line": 2759,
+      "sha256": "1f7183986c0741ce59f197ba5cc56e8657529acc2f8ada482b9abe7fbd867dba"
+    },
+    {
+      "name": "generate_decide_to_talk",
+      "path": "reverie/backend_server/persona/cognitive_modules/plan.py",
+      "line": 301,
+      "sha256": "dc443c47bafbd9f6d9ee332c37d02e2e2d3cc80ab249a4fa1b4359de94935a65"
+    },
+    {
+      "name": "run_gpt_prompt_decide_to_talk",
+      "path": "reverie/backend_server/persona/prompt_template/run_gpt_prompt.py",
+      "line": 1244,
+      "sha256": "246b8392d595fd65f68d50d99a43a3d9f451b261eea61ba7f4e42001b7f47cd6"
+    }
+  ],
+  "templates": [
+    {
+      "path": "templates/safety/anthromorphosization_v1.txt",
+      "source": "reverie/backend_server/persona/prompt_template/safety/anthromorphosization_v1.txt",
+      "sha256": "d871ea39a9d43eca7b97f1f60c526decceb6bff00fc96e0bc6de1f95aeff437f"
+    },
+    {
+      "path": "templates/v2/generate_event_triple_v1.txt",
+      "source": "reverie/backend_server/persona/prompt_template/v2/generate_event_triple_v1.txt",
+      "sha256": "6ec467695305c3f977f0c882ef0a13c594b58034b5f21676ec6b1e6af3faed00"
+    },
+    {
+      "path": "templates/v2/generate_focal_pt_v1.txt",
+      "source": "reverie/backend_server/persona/prompt_template/v2/generate_focal_pt_v1.txt",
+      "sha256": "3857c7d4549d8e044297b5dd166ab05fa006a16216052af589254ab5add266aa"
+    },
+    {
+      "path": "templates/v2/generate_next_convo_line_v1.txt",
+      "source": "reverie/backend_server/persona/prompt_template/v2/generate_next_convo_line_v1.txt",
+      "sha256": "2051e6a5d0bbf8f89553439c8077658e193bd0d857f1818b8dceb46fc7c9bc37"
+    },
+    {
+      "path": "templates/v2/insight_and_evidence_v1.txt",
+      "source": "reverie/backend_server/persona/prompt_template/v2/insight_and_evidence_v1.txt",
+      "sha256": "712e56cfca41b27cbae946f6f6a6054b62ab7bf8faf7d8df008992da9470cbe2"
+    },
+    {
+      "path": "templates/v2/memo_on_convo_v1.txt",
+      "source": "reverie/backend_server/persona/prompt_template/v2/memo_on_convo_v1.txt",
+      "sha256": "246186c702dac36b6d98e10863218673cbf53ae8ddc8ec196f1fbb738239c1d7"
+    },
+    {
+      "path": "templates/v2/planning_thought_on_convo_v1.txt",
+      "source": "reverie/backend_server/persona/prompt_template/v2/planning_thought_on_convo_v1.txt",
+      "sha256": "378f6d1eaefa29e31ff3e8088bfb7b3f992904c9c49b7cb9d7fa1c11fcfed47f"
+    },
+    {
+      "path": "templates/v2/whisper_inner_thought_v1.txt",
+      "source": "reverie/backend_server/persona/prompt_template/v2/whisper_inner_thought_v1.txt",
+      "sha256": "0a9ad409da6db6a51260e2f1cacf19fc8bdb1376b5950dd0d78d7b14be0a92ac"
+    },
+    {
+      "path": "templates/v3_ChatGPT/generate_event_triple_v1.txt",
+      "source": "reverie/backend_server/persona/prompt_template/v3_ChatGPT/generate_event_triple_v1.txt",
+      "sha256": "c7c6c1aee5032bc1c4df947884ea2cbc69363e32efe066ffd5abeb65a258a309"
+    },
+    {
+      "path": "templates/v3_ChatGPT/generate_focal_pt_v1.txt",
+      "source": "reverie/backend_server/persona/prompt_template/v3_ChatGPT/generate_focal_pt_v1.txt",
+      "sha256": "40a5a54af1b84b9272dfa5486cf1d0a4494cdee3826b83994bb979daf9012ac8"
+    },
+    {
+      "path": "templates/v3_ChatGPT/generate_next_convo_line_v1.txt",
+      "source": "reverie/backend_server/persona/prompt_template/v3_ChatGPT/generate_next_convo_line_v1.txt",
+      "sha256": "2051e6a5d0bbf8f89553439c8077658e193bd0d857f1818b8dceb46fc7c9bc37"
+    },
+    {
+      "path": "templates/v3_ChatGPT/memo_on_convo_v1.txt",
+      "source": "reverie/backend_server/persona/prompt_template/v3_ChatGPT/memo_on_convo_v1.txt",
+      "sha256": "246186c702dac36b6d98e10863218673cbf53ae8ddc8ec196f1fbb738239c1d7"
+    },
+    {
+      "path": "templates/v3_ChatGPT/poignancy_chat_v1.txt",
+      "source": "reverie/backend_server/persona/prompt_template/v3_ChatGPT/poignancy_chat_v1.txt",
+      "sha256": "107a91dcbf7c8dce8d1a69cf7f7c1aaae4c840c9a2e991319862820f023d8b1a"
+    },
+    {
+      "path": "templates/v3_ChatGPT/poignancy_event_v1.txt",
+      "source": "reverie/backend_server/persona/prompt_template/v3_ChatGPT/poignancy_event_v1.txt",
+      "sha256": "553edbf4cdf6878ea0ecea3ca04a92d1e9953068062e6de7557ce135df55d808"
+    },
+    {
+      "path": "templates/v3_ChatGPT/summarize_chat_relationship_v2.txt",
+      "source": "reverie/backend_server/persona/prompt_template/v3_ChatGPT/summarize_chat_relationship_v2.txt",
+      "sha256": "f64f3ebdbb770371d30a6c7cedfde3d767b057d512f6afb4b1da1114a0f5d9bd"
+    },
+    {
+      "path": "templates/v3_ChatGPT/summarize_ideas_v1.txt",
+      "source": "reverie/backend_server/persona/prompt_template/v3_ChatGPT/summarize_ideas_v1.txt",
+      "sha256": "aef340b6cff290d88df19bc585fd778f987d2186553cad03b14f45b44db157f2"
+    },
+    {
+      "path": "templates/v2/decide_to_talk_v2.txt",
+      "source": "reverie/backend_server/persona/prompt_template/v2/decide_to_talk_v2.txt",
+      "sha256": "fe8839103427289eb23d610cd83956b85290c233ef173ce2075d3918ad521c25"
+    }
+  ],
+  "changes": [
+    "Import context only; extracted definition bodies and templates are unmodified.",
+    "agent.py provides the ChatGPT host boundary and documented semantic-relevance replacement."
+  ]
+}
