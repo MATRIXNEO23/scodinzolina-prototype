@@ -101,9 +101,12 @@ def parse_time(meta: dict, path: Path) -> dt.datetime:
             return parsed.replace(microsecond=0)
         except ValueError:
             pass
-    m = re.search(r"(20\d{2})[-/]?(\d{2})[-/]?(\d{2})", path.as_posix())
-    if m:
-        return dt.datetime(int(m.group(1)), int(m.group(2)), int(m.group(3)))
+    # Only accept calendar-looking separators; never infer dates from temp-dir digits.
+    for m in re.finditer(r"(20\d{2})[-/](\d{2})[-/](\d{2})", path.as_posix()):
+        try:
+            return dt.datetime(int(m.group(1)), int(m.group(2)), int(m.group(3)))
+        except ValueError:
+            continue
     return dt.datetime(1970, 1, 1)
 
 
@@ -124,13 +127,11 @@ def title_from_body(body: str, path: Path) -> str:
 
 def manifest(source_root: Path):
     path = source_root / "rag" / "memory_manifest.json"
-    data = json.loads(path.read_text(encoding="utf-8"))
-    return data
+    return json.loads(path.read_text(encoding="utf-8"))
 
 
 def excluded(rel: str, data: dict) -> bool:
     patterns = list(data.get("exclude", [])) + list(data.get("rag_exclude", []))
-    # Derived indexes are projections, even when old manifests list individual routers.
     patterns += ["rag/index/**", ".git/**", "rag/memories/tessa/**", "romanzo/**"]
     return any(fnmatch.fnmatch(rel, p) for p in patterns)
 
@@ -147,10 +148,7 @@ def inventory(source_root: Path):
             if not path.is_file():
                 continue
             rel = path.relative_to(source_root).as_posix()
-            if excluded(rel, data):
-                continue
-            # Other owners are excluded; this migration is GPTina-only.
-            if rel.startswith("rag/memories/tessa/"):
+            if excluded(rel, data) or rel.startswith("rag/memories/tessa/"):
                 continue
             found.setdefault(rel, {"path": path, "source_role": kind})
     for pattern, kind in EXTRA_PATTERNS:
@@ -244,11 +242,10 @@ def build(source_root: Path, agent_name: str, generated_at: str):
     counts = {"event": 0, "thought": 0, "non_operational": 0}
     for record in records:
         add = memory.add_thought if record["node_type"] == "thought" else memory.add_event
-        filling = None
         node = add(record["created"], None, agent_name,
                    "historically records" if record["node_type"] == "event" else "historically reflects on",
                    record["memory_id"], record["text"], set(record["keywords"]),
-                   record["poignancy"], (record["text"], None), filling)
+                   record["poignancy"], (record["text"], None), None)
         counts[record["node_type"]] += 1
         counts["non_operational"] += int(record["non_operational"])
         sources[node.node_id] = {
