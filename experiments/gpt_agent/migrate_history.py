@@ -1,13 +1,16 @@
-"""Convert GPTina legacy memory records into native gpt_agent AssociativeMemory state.
+"""Migrate the complete GPTina continuity into native gpt_agent memory.
 
-No model call is used during migration. The source repository is treated as read-only.
-The result is a tracked bootstrap file that can initialize the experimental agent
-after the legacy memory architecture is removed.
+The canonical repository is read-only input. Durable memories, decisions/checkpoints,
+reflections, identity material, shared language, transcripts/raw sessions and protected
+historical sources are preserved with provenance. Legacy recovery protocols/policies are
+preserved as historical NON-OPERATIVE knowledge so they cannot govern the new runtime.
+Derived indexes/projections and other owners are intentionally excluded.
 """
 from __future__ import annotations
 
 import argparse
 import datetime as dt
+import fnmatch
 import hashlib
 import json
 from pathlib import Path
@@ -20,6 +23,24 @@ try:
 except ImportError:
     import agent
     import upstream as core
+
+CANONICAL = "MATRIXNEO23/scodinzolina-conntinuity"
+THOUGHT_KINDS = {
+    "reflection", "self_portrait", "shared_language", "stable_principles",
+    "legacy_message", "protected_historical_gptina", "historical_voice_capsule",
+    "historical_continuity_hypothesis",
+}
+NON_OPERATIVE_KINDS = {
+    "restore_protocol", "recovery_protocol", "save_recovery_runbook",
+    "memory_protocol", "ownership_policy", "access_policy", "scale_strategy",
+    "visual_schema", "live_protocol", "live_documentation", "regression_test",
+}
+DERIVED_KINDS = {"current_router", "fast_router", "chronology_router", "visual_router"}
+EXTRA_PATTERNS = [
+    ("agent-exchanges/agents/gptina.md", "historical_agent_profile"),
+    ("agent-exchanges/correspondence/**/*.md", "historical_agent_correspondence"),
+    ("RISPOSTA_GPTINA_POSTICINO_SEGRETO*.md", "protected_historical_gptina"),
+]
 
 
 def sha256(path: Path) -> str:
@@ -50,10 +71,7 @@ def scalar(front: str, key: str):
 
 
 def list_field(front: str, key: str):
-    lines = front.splitlines()
-    out = []
-    active = False
-    indent = None
+    lines, out, active, indent = front.splitlines(), [], False, None
     for line in lines:
         if re.match(rf"^{re.escape(key)}:\s*\[\]\s*$", line):
             return []
@@ -66,8 +84,7 @@ def list_field(front: str, key: str):
                 if indent is None:
                     indent = len(m.group(1))
                 if len(m.group(1)) == indent:
-                    value = m.group(2).strip().strip('"')
-                    out.append(value)
+                    out.append(m.group(2).strip().strip('"'))
                     continue
             if line and not line.startswith(" "):
                 break
@@ -90,11 +107,11 @@ def parse_time(meta: dict, path: Path) -> dt.datetime:
     return dt.datetime(1970, 1, 1)
 
 
-def importance_to_poignancy(value) -> int:
+def importance_to_poignancy(value, kind: str) -> int:
     try:
         value = int(value)
     except (TypeError, ValueError):
-        value = 3
+        value = 4 if kind in THOUGHT_KINDS else 3
     return max(1, min(10, value * 2))
 
 
@@ -105,19 +122,59 @@ def title_from_body(body: str, path: Path) -> str:
     return path.stem
 
 
-def read_record(path: Path, source_root: Path):
+def manifest(source_root: Path):
+    path = source_root / "rag" / "memory_manifest.json"
+    data = json.loads(path.read_text(encoding="utf-8"))
+    return data
+
+
+def excluded(rel: str, data: dict) -> bool:
+    patterns = list(data.get("exclude", [])) + list(data.get("rag_exclude", []))
+    # Derived indexes are projections, even when old manifests list individual routers.
+    patterns += ["rag/index/**", ".git/**", "rag/memories/tessa/**", "romanzo/**"]
+    return any(fnmatch.fnmatch(rel, p) for p in patterns)
+
+
+def inventory(source_root: Path):
+    data = manifest(source_root)
+    found = {}
+    declared = list(data.get("sources", [])) + list(data.get("rag_sources", []))
+    for spec in declared:
+        pattern, kind = spec["pattern"], spec.get("kind", "legacy_source")
+        if kind in DERIVED_KINDS:
+            continue
+        for path in source_root.glob(pattern):
+            if not path.is_file():
+                continue
+            rel = path.relative_to(source_root).as_posix()
+            if excluded(rel, data):
+                continue
+            # Other owners are excluded; this migration is GPTina-only.
+            if rel.startswith("rag/memories/tessa/"):
+                continue
+            found.setdefault(rel, {"path": path, "source_role": kind})
+    for pattern, kind in EXTRA_PATTERNS:
+        for path in source_root.glob(pattern):
+            if path.is_file():
+                rel = path.relative_to(source_root).as_posix()
+                if not excluded(rel, data):
+                    found.setdefault(rel, {"path": path, "source_role": kind})
+    return [found[k] for k in sorted(found)]
+
+
+def read_record(item: dict, source_root: Path, overrides: dict):
+    path, source_role = item["path"], item["source_role"]
     rel = path.relative_to(source_root).as_posix()
+    raw = path.read_text(encoding="utf-8", errors="replace")
+    front, body, meta = "", raw, {}
     if path.suffix.lower() == ".json":
-        raw = path.read_text(encoding="utf-8")
         try:
             payload = json.loads(raw)
         except json.JSONDecodeError:
             payload = {"raw": raw}
         body = json.dumps(payload, ensure_ascii=False, sort_keys=True)
         meta = payload if isinstance(payload, dict) else {}
-        front = ""
     else:
-        raw = path.read_text(encoding="utf-8")
         front, body = split_frontmatter(raw)
         meta = {k: scalar(front, k) for k in (
             "schema_version", "memory_id", "owner", "kind", "event_at",
@@ -125,17 +182,22 @@ def read_record(path: Path, source_root: Path):
             "append_only")}
         for k in ("supersedes", "thread_ids", "entity_refs", "source_refs", "media_refs", "tags"):
             meta[k] = list_field(front, k)
+
+    override = overrides.get(rel, {})
+    status = override.get("status") or meta.get("status") or "historical"
     title = title_from_body(body, path)
-    status = meta.get("status") or "legacy"
     memory_id = meta.get("memory_id") or rel
-    prefix = f"[IMPORTED HISTORY | status={status} | source={rel}]\n"
+    non_operational = source_role in NON_OPERATIVE_KINDS
+    marker = "NON-OPERATIVE LEGACY SOURCE" if non_operational else "IMPORTED HISTORY"
+    prefix = f"[{marker} | role={source_role} | status={status} | source={rel}]\n"
     text = prefix + body.strip()
     tags = list(meta.get("tags") or [])
-    keywords = {"gptina", "imported-history", status.lower()}
+    keywords = {"gptina", "imported-history", source_role.lower(), str(status).lower()}
     keywords.update(str(v).lower() for v in tags if v)
     for v in meta.get("entity_refs") or []:
         if isinstance(v, str) and len(v) < 80:
             keywords.add(v.lower())
+
     return {
         "path": rel,
         "sha256": sha256(path),
@@ -143,28 +205,16 @@ def read_record(path: Path, source_root: Path):
         "text": text,
         "memory_id": str(memory_id),
         "created": parse_time(meta, path),
-        "poignancy": importance_to_poignancy(meta.get("importance")),
+        "poignancy": importance_to_poignancy(meta.get("importance"), source_role),
         "keywords": sorted(keywords),
         "metadata": meta,
         "frontmatter": front,
+        "source_role": source_role,
+        "status": status,
+        "status_override": override or None,
+        "non_operational": non_operational,
+        "node_type": "thought" if source_role in THOUGHT_KINDS else "event",
     }
-
-
-def inventory(source_root: Path):
-    candidates = []
-    root = source_root / "rag" / "memories"
-    if not root.exists():
-        raise ValueError(f"Missing legacy memory root: {root}")
-    for path in root.glob("*.md"):
-        if path.name != "README.md":
-            candidates.append(path)
-    candidates.extend(root.glob("*.json"))
-    gptina = root / "gptina"
-    if gptina.exists():
-        candidates.extend(gptina.rglob("*.md"))
-        candidates.extend(gptina.rglob("*.json"))
-    # Never import other owners such as rag/memories/tessa/**.
-    return sorted(set(candidates), key=lambda p: p.as_posix())
 
 
 def empty_memory():
@@ -172,13 +222,15 @@ def empty_memory():
         directory = Path(directory)
         (directory / "nodes.json").write_text("{}", encoding="utf-8")
         (directory / "embeddings.json").write_text("{}", encoding="utf-8")
-        (directory / "kw_strength.json").write_text(
-            json.dumps({"kw_strength_event": {}, "kw_strength_thought": {}}), encoding="utf-8")
+        (directory / "kw_strength.json").write_text(json.dumps({
+            "kw_strength_event": {}, "kw_strength_thought": {}}), encoding="utf-8")
         return core.AssociativeMemory(str(directory))
 
 
 def build(source_root: Path, agent_name: str, generated_at: str):
-    records = [read_record(path, source_root) for path in inventory(source_root)]
+    mfest = manifest(source_root)
+    records = [read_record(item, source_root, mfest.get("status_overrides", {}))
+               for item in inventory(source_root)]
     records.sort(key=lambda r: (r["created"], r["path"]))
 
     scratch = core.Scratch(str(source_root / "__absent_bootstrap__.json"))
@@ -188,23 +240,30 @@ def build(source_root: Path, agent_name: str, generated_at: str):
         raise ValueError("generated_at must be naive UTC seconds precision")
     scratch.curr_time = generated
 
-    memory = empty_memory()
-    sources = {}
+    memory, sources = empty_memory(), {}
+    counts = {"event": 0, "thought": 0, "non_operational": 0}
     for record in records:
-        node = memory.add_event(
-            record["created"], None,
-            agent_name, "remembers", record["memory_id"],
-            record["text"], set(record["keywords"]), record["poignancy"],
-            (record["text"], None), None)
+        add = memory.add_thought if record["node_type"] == "thought" else memory.add_event
+        filling = None
+        node = add(record["created"], None, agent_name,
+                   "historically records" if record["node_type"] == "event" else "historically reflects on",
+                   record["memory_id"], record["text"], set(record["keywords"]),
+                   record["poignancy"], (record["text"], None), filling)
+        counts[record["node_type"]] += 1
+        counts["non_operational"] += int(record["non_operational"])
         sources[node.node_id] = {
-            "source": f"canonical://MATRIXNEO23/scodinzolina-conntinuity/{record['path']}",
-            "migration": "legacy-to-gpt-agent-native-v1",
+            "source": f"canonical://{CANONICAL}/{record['path']}",
+            "migration": "continuity-to-gpt-agent-native-v2",
             "original_path": record["path"],
             "original_sha256": record["sha256"],
             "original_title": record["title"],
+            "source_role": record["source_role"],
+            "status": record["status"],
+            "status_override": record["status_override"],
             "original_metadata": record["metadata"],
             "original_frontmatter": record["frontmatter"],
-            "imported_as": "event",
+            "imported_as": record["node_type"],
+            "non_operational_legacy_instruction": record["non_operational"],
             "historical_not_lived_by_new_runtime": True,
         }
 
@@ -216,15 +275,18 @@ def build(source_root: Path, agent_name: str, generated_at: str):
         "last": {"answers": [], "result": {
             "initialized": agent_name,
             "history_migrated": len(records),
-            "migration": "legacy-to-gpt-agent-native-v1"
+            "migration": "continuity-to-gpt-agent-native-v2",
+            "counts": counts,
         }},
     }
     agent.validate_memory(agent.persona_load(state))
     return {
-        "schema": "gpt-agent-native-bootstrap-v1",
-        "source_repository": "MATRIXNEO23/scodinzolina-conntinuity",
-        "source_scope": ["rag/memories/*.md|json", "rag/memories/gptina/**/*.md|json"],
+        "schema": "gpt-agent-native-bootstrap-v2",
+        "source_repository": CANONICAL,
+        "source_commit": None,
+        "source_scope": "memory_manifest declared sources + GPTina historical extras; derived projections excluded",
         "record_count": len(records),
+        "counts": counts,
         "generated_at": generated_at,
         "state": state,
     }
@@ -236,11 +298,15 @@ def main():
     p.add_argument("--output", type=Path, required=True)
     p.add_argument("--name", default="GPTina")
     p.add_argument("--generated-at", required=True)
+    p.add_argument("--source-commit")
     args = p.parse_args()
     result = build(args.source_root.resolve(), args.name, args.generated_at)
+    if args.source_commit:
+        result["source_commit"] = args.source_commit
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(result, ensure_ascii=False, sort_keys=True, indent=2), encoding="utf-8")
-    print(json.dumps({"status": "migrated", "records": result["record_count"], "output": str(args.output)}, ensure_ascii=False))
+    print(json.dumps({"status": "migrated", "records": result["record_count"],
+                      "counts": result["counts"], "output": str(args.output)}, ensure_ascii=False))
 
 
 if __name__ == "__main__":
