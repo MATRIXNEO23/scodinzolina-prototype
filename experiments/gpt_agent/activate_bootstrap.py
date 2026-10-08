@@ -10,10 +10,12 @@ try:
 except ImportError:
     import agent
 
+SUPPORTED = {"gpt-agent-native-bootstrap-v1", "gpt-agent-native-bootstrap-v2"}
+
 
 def activate(path: Path, force: bool = False):
     payload = json.loads(path.read_text(encoding="utf-8"))
-    if payload.get("schema") != "gpt-agent-native-bootstrap-v1":
+    if payload.get("schema") not in SUPPORTED:
         raise ValueError("Unsupported bootstrap schema")
     state = payload.get("state")
     if not isinstance(state, dict):
@@ -28,6 +30,7 @@ def activate(path: Path, force: bool = False):
         agent.atomic_save(state)
     return {
         "status": "activated",
+        "schema": payload["schema"],
         "memory_count": len(state["memory"]["nodes"]),
         "bootstrap": str(path),
         "state_sha256": agent.receipt(state)["state_sha256"],
